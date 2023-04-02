@@ -12,9 +12,9 @@ cc  -g -Wall -Wextra -Werror -D BUFFER_SIZE=$1 \
 if [ "$2" = "debug" ]
 then
     # Debug the program
-    valgrind --leak-check=yes --track-origins=yes ./a.out ${3} 2> valgrind_result.txt
+    valgrind --leak-check=yes --track-origins=yes ./a.out ${3} 2>&1
     # Display the result
-    cat valgrind_result.txt
+    # cat valgrind_result.txt
     exit 0
 elif [ "$2" = "run" ]
 then

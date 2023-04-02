@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 12:26:11 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/02 18:51:04 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 00:29:02 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int	run_static_test(char *file_in, char *file_out)
 	while (line)
 	{
 		printf("%s", line);
-		write(out, line, strlen(line));
+		write(out, line,ft_strlen(line));
 		free(line);
 		line = get_next_line(in);
 	}
@@ -74,6 +74,7 @@ int	run_static_test(char *file_in, char *file_out)
 		printf("\nTest for file: %s failed\n", file_in);
 		reset();
 	}
+	remove(file_out);
 	return (0);
 }
 
@@ -92,8 +93,7 @@ void	run_interactive_test(void)
 	line = get_next_line(in);
 	while (line)
 	{
-		printf("%s", line);
-		write(out, line, strlen(line));
+		write(out, line, ft_strlen(line));
 		free(line);
 		line = get_next_line(in);
 	}
