@@ -2,14 +2,24 @@
 
 if [ -z "$1" ]
 then
-    echo "Usage: ./compile.sh <buffersize>"
+    echo "Usage: ./compile.sh <buffersize> [[debug <filename> | interactive ] | [debug <filename> | interactive ] ]"
     exit 1
 fi
 # Compile the program
-cc -g -Wall -Wextra -Werror -D BUFFER_SIZE=$1 test.c ../get_next_line.c ../get_next_line_utils.c
+cc  -g -Wall -Wextra -Werror -D BUFFER_SIZE=$1 \
+    test.c test_utils.c ../get_next_line.c ../get_next_line_utils.c
 # Run the program
-#./a.out
-# Debug the program
-valgrind --leak-check=yes --track-origins=yes ./a.out 2> valgrind_result.txt
-# Display the result
-cat valgrind_result.txt
+if [ "$2" = "debug" ]
+then
+    # Debug the program
+    valgrind --leak-check=yes --track-origins=yes ./a.out ${3} 2> valgrind_result.txt
+    # Display the result
+    cat valgrind_result.txt
+    exit 0
+elif [ "$2" = "run" ]
+then
+    # Run the program
+    ./a.out ${3}
+    exit 0
+fi
+exit 0
