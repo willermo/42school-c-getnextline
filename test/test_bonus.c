@@ -6,79 +6,131 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 12:26:11 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/02 17:53:49 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 00:35:07 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "test.h"
 
-int	main(void)
+// COLORS
+void	black()		{ printf("\033[1;30m"); }
+void	red()		{ printf("\033[1;31m"); }
+void	green()		{ printf("\033[1;32m"); }
+void	yellow() 	{ printf("\033[1;33m"); }
+void	blue()		{ printf("\033[1;34m"); }
+void	purple()	{ printf("\033[1;35m"); }
+void	cyan()		{ printf("\033[1;36m"); }
+void	white()		{ printf("\033[1;37m"); }
+void	reset () 	{ printf("\033[0m"); }
+
+void print_usage(void)
 {
-	char	*files[11];
-	char	file_out[20];
+	printf("Usage: ./test [ <file name> | interactive ]\n");
+}
+
+int	run_static_test(char *file_in, char *file_out)
+{
+	t_fd	in;
 	t_fd	out;
-	t_fd_list	*fd_list;
-	t_fd_list	*fd_runner;
 	char	*line;
-	int		i;
+
+	cyan();
+	printf("Testing file %s\n", file_in);
+	reset();
+	in = open(file_in, O_RDONLY);
+	if (in == -1)
+	{
+		yellow();
+		printf("Error opening file_in: %s (error %d)\n", file_in, errno);
+		reset();
+		return (errno);
+	}
+	out = open(file_out, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (out == -1)
+	{
+		yellow();
+		printf("Error opening file_out: %s (error %d)\n", file_out, errno);
+		reset();
+		return (errno);
+	}
+	line = get_next_line(in);
+	while (line)
+	{
+		printf("%s", line);
+		write(out, line,ft_strlen(line));
+		free(line);
+		line = get_next_line(in);
+	}
+	close(out);
+	if (execl("diff", "diff", file_in, file_out, NULL))
+	{
+		green();
+		printf("\nTest for file: %s passed\n", file_in);
+		reset();
+	}
+	else
+	{
+		red();
+		printf("\nTest for file: %s failed\n", file_in);
+		reset();
+	}
+	remove(file_out);
+	return (0);
+}
+
+void	run_interactive_test(void)
+{
+	t_fd	in;
+	t_fd	out;
+	char	*line;
+
+	in = 0;
+	out = 1;
+	cyan();
+	printf("Interactive testing\n");
+	reset();
+	printf("Enter text to test get_next_line (^D to end)\n");
+	line = get_next_line(in);
+	while (line)
+	{
+		write(out, line, ft_strlen(line));
+		free(line);
+		line = get_next_line(in);
+	}
+}
+
+int	main(int argc, char **argv)
+{
+	char	*file_in;
+	char	*file_out;
 	int		result;
 
-	i = 0;
-	while (i < NUMBER_OF_TESTS)
+	if(argc != 2)
 	{
-		files[i] = ft_strjoin("test", ft_itoa(i + 1), ".txt");
-		i++;
+		print_usage();
+		return (1);
 	}
-	files[i] = NULL;
-	fd_list = malloc(sizeof(t_fd_list));
-	fd_list->fd = -1;
-	fd_list->next = NULL;
 
+	result = 0;
+	blue();
 	printf("Testing get_next_line\n");
 	printf("Buffer size: %d\n", BUFFER_SIZE);
-	fd_runner = fd_list;
-	i = 0;
-	while (i < NUMBER_OF_TESTS)
+	reset();
+	printf("----------------------------\n");
+	if (ft_strncmp(argv[1], "interactive", 11) == 0)
+		run_interactive_test();
+	else
 	{
-		fd_runner->fd = open(files[i], O_RDONLY);
-		if (fd_runner->fd == -1)
-		{
-			printf("Error opening file %s (error %d)\n", *files, errno);
-			free_files(files);
-			return (errno);
-		}
-		i++;
-		fd_runner->next = malloc(sizeof(t_fd_list));
-		fd_runner = fd_runner->next;
-		fd_runner->fd = -1;
-		fd_runner->next = NULL;
+		//sets file_in to the first argument
+		file_in = ft_strdup(argv[1]);
+		//sets file_out to the same string as file_in, but with ".out" appended
+		file_out = malloc(ft_strlen(file_in) + 4);
+		ft_strlcpy(file_out, file_in, ft_strlen(file_in) - 3);
+		ft_strlcat(file_out, ".out", ft_strlen(file_in) + 4);
+		// runs the test
+		result = run_static_test(file_in, file_out);
+		free(file_in);
+		free(file_out);
 	}
-	fd_runner = fd_list;
-	i = 0;
-	while (fd_runner->fd != -1)
-	{
-		printf("Test %d - fd %d\n", i + 1, fd_runner->fd);
-		strcpy(file_out, files[i]);
-		strcat(file_out, ".out");
-		out = open(file_out, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		line = get_next_line(fd_runner->fd);
-		while (line)
-		{
-			printf("%s", line);
-			write(out, line, strlen(line));
-			free(line);
-			line = get_next_line(fd_runner->fd);
-		}
-		close(out);
-		result = NULL;
-		if (execl("diff", "diff", files[i], file_out, NULL))
-			printf("Test %d passed (file: %s)\n", i + 1, files[i]);
-		else
-			printf("Test %d failed (file: %s)\n", i + 1, files[i]);
-		i++;
-		fd_runner = fd_runner->next;
-	}
-	free_files(files);
-	free_files_list(fd_list);
-	return (0);
+	return (result);
 }
