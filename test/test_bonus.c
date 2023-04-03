@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 12:26:11 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 03:24:00 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 11:18:14 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	reset () 	{ printf("\033[0m"); }
 
 void print_usage(void)
 {
-	printf("Usage: ./test [ static | interactive ]\n");
+	printf("Usage: <executable_file> [ static | interactive ]\n");
 }
 
 int	run_static_test1(t_fd_list *files, char **filenames)
@@ -53,11 +53,10 @@ int	run_static_test1(t_fd_list *files, char **filenames)
 		cyan();
 		printf("Testing file %s\n", filenames[i]);
 		reset();
-		printf("%d\n", files->fd);
 		line = get_next_line(files->fd);
 		while (line)
 		{
-			printf("%s", line);
+			//printf("%s", line);
 			write(out, line, ft_strlen(line));
 			free(line);
 			line = get_next_line(files->fd);
@@ -66,13 +65,13 @@ int	run_static_test1(t_fd_list *files, char **filenames)
 		if (execl("diff", "diff", filenames[i], out_filename, NULL))
 		{
 			green();
-			printf("\nTest for file: %s passed\n", filenames[i]);
+			printf("Test for file: %s passed\n\n", filenames[i]);
 			reset();
 		}
 		else
 		{
 			red();
-			printf("\nTest for file: %s failed\n", filenames[i]);
+			printf("Test for file: %s failed\n", filenames[i]);
 			reset();
 		}
 		remove(out_filename);
@@ -131,19 +130,18 @@ int	main(int argc, char **argv)
 		set_filenames(filenames);
 		//opens files
 		files = NULL;
-		open_files(files, filenames);
+		open_files(&files, filenames);
 		// runs static test 1
 		result = run_static_test1(files, filenames);
 		//closes files
 		close_files(files);
-		//frees filenames
-		free_filenames(filenames);
+		// cleanup
+		static_cleanup(&files, &filenames);
 	}
 	else
 	{
 		print_usage();
 		return (1);
 	}
-	free_files_list(files);
 	return (result);
 }
