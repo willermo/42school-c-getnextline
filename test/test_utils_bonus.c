@@ -1,57 +1,102 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test_utils.c                                       :+:      :+:    :+:   */
+/*   test_utils_bonus.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 16:47:56 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 01:11:10 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 03:16:52 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "test.h"
+#include "test_bonus.h"
 
-void	free_files(char **files)
+t_fd_list	*add_file(t_fd_list *files, char *filename)
+{
+	t_fd_list	*new;
+	t_fd		fd;
+
+	fd = open(filename, O_RDONLY);
+	if (fd < 0)
+		return (NULL);
+	new = get_fd_list(&files, fd);
+	return (new);
+}
+
+void	set_filenames(char **filenames)
 {
 	int i;
 
 	i = 0;
 	while (i < NUMBER_OF_TESTS)
 	{
-		free(files[i]);
+		filenames[i] = ft_strjoin("test", ft_itoa(i + 1), ".txt");
 		i++;
 	}
+	filenames[i] = NULL;
 }
 
-void	remove_files(char **files)
+void	open_files(t_fd_list *files, char **filenames)
 {
-	int i;
+	int 	i;
 
 	i = 0;
 	while (i < NUMBER_OF_TESTS)
 	{
-		remove(files[i]);
+		if (add_file(files, filenames[i]) == NULL)
+		{
+			yellow();
+			printf("Error opening file %s (error %d)\n", filenames[i], errno);
+			reset();
+			close_files(files);
+			free_filenames(filenames);
+			exit(errno);
+		}
 		i++;
 	}
 }
 
-void	clean_files(char **files)
+void	close_files(t_fd_list *files)
 {
-	remove_files(files);
-	free_files(files);
+	while (files)
+	{
+		close(files->fd);
+		files = files->next;
+	}
 }
 
-void	free_files_list(t_fd_list *fd_list)
+void	free_filenames(char **filenames)
 {
-	t_fd_list	*fd_runner;
+	while (*filenames)
+		free(*filenames++);
+}
 
-	fd_runner = fd_list;
-	while (fd_runner)
+// beware: this function removes the files from the filesystem
+void	remove_files(char **filenames)
+{
+	while (*filenames)
+		remove(*filenames++);
+}
+
+// beware: this function removes the files from the filesystem
+void	clean_filenames(char **filenames)
+{
+	remove_files(filenames);
+	free_filenames(filenames);
+}
+
+void	free_files_list(t_fd_list *file_list)
+{
+	t_fd_list	*file;
+
+	file = file_list;
+	while (file)
 	{
-		fd_list = fd_list->next;
-		free(fd_runner);
-		fd_runner = fd_list;
+		file_list = file_list->next;
+		free(file->buffer);
+		free(file);
+		file = file_list;
 	}
 }
 

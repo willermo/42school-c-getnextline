@@ -6,11 +6,11 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 16:50:31 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/02 12:33:37 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 03:14:19 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*expand_line_buffer(char *line, size_t dim)
 {
@@ -53,4 +53,37 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 		i++;
 	}
 	return (dest);
+}
+
+t_fd_list	*new_fd_list(t_fd fd)
+{
+	t_fd_list	*new;
+
+	new = (t_fd_list *) malloc(sizeof(t_fd_list));
+	if (!new)
+		return (NULL);
+	new->fd = fd;
+	new->buffer = (char *) ft_calloc(BUFFER_SIZE, sizeof(char));
+	new->bytes_read = 0;
+	new->bytes_remaining = 0;
+	new->next = NULL;
+	return (new);
+}
+
+t_fd_list	*get_fd_list(t_fd_list **fd_list, t_fd fd)
+{
+	t_fd_list	*current;
+
+	if (!*fd_list)
+	{
+		*fd_list = new_fd_list(fd);
+		return (*fd_list);
+	}
+	current = *fd_list;
+	while (current->fd != fd && current->next)
+		current = current->next;
+	if (current->fd == fd)
+		return (current);
+	current->next = new_fd_list(fd);
+	return (current->next);
 }

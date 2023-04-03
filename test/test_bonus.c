@@ -6,11 +6,11 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 12:26:11 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 00:35:07 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 03:24:00 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "test.h"
+#include "test_bonus.h"
 
 // COLORS
 void	black()		{ printf("\033[1;30m"); }
@@ -25,56 +25,61 @@ void	reset () 	{ printf("\033[0m"); }
 
 void print_usage(void)
 {
-	printf("Usage: ./test [ <file name> | interactive ]\n");
+	printf("Usage: ./test [ static | interactive ]\n");
 }
 
-int	run_static_test(char *file_in, char *file_out)
+int	run_static_test1(t_fd_list *files, char **filenames)
 {
-	t_fd	in;
-	t_fd	out;
-	char	*line;
+	t_fd		out;
+	char		*out_filename;
+	char		*line;
+	int			i;
 
-	cyan();
-	printf("Testing file %s\n", file_in);
-	reset();
-	in = open(file_in, O_RDONLY);
-	if (in == -1)
+	i = 0;
+	while (i < NUMBER_OF_TESTS)
 	{
-		yellow();
-		printf("Error opening file_in: %s (error %d)\n", file_in, errno);
+		//sets file_out to the same string as file_in, but with ".out" appended
+		out_filename = malloc(ft_strlen(filenames[i]) + 4);
+		ft_strlcpy(out_filename, filenames[i], ft_strlen(filenames[i]) - 3);
+		ft_strlcat(out_filename, ".out", ft_strlen(filenames[i]) + 4);
+		out = open(out_filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (out == -1)
+		{
+			yellow();
+			printf("Error opening file_out: %s (error %d)\n", out_filename, errno);
+			reset();
+			return (errno);
+		}
+		cyan();
+		printf("Testing file %s\n", filenames[i]);
 		reset();
-		return (errno);
+		printf("%d\n", files->fd);
+		line = get_next_line(files->fd);
+		while (line)
+		{
+			printf("%s", line);
+			write(out, line, ft_strlen(line));
+			free(line);
+			line = get_next_line(files->fd);
+		}
+		close(out);
+		if (execl("diff", "diff", filenames[i], out_filename, NULL))
+		{
+			green();
+			printf("\nTest for file: %s passed\n", filenames[i]);
+			reset();
+		}
+		else
+		{
+			red();
+			printf("\nTest for file: %s failed\n", filenames[i]);
+			reset();
+		}
+		remove(out_filename);
+		free(out_filename);
+		files = files->next;
+		i++;
 	}
-	out = open(file_out, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (out == -1)
-	{
-		yellow();
-		printf("Error opening file_out: %s (error %d)\n", file_out, errno);
-		reset();
-		return (errno);
-	}
-	line = get_next_line(in);
-	while (line)
-	{
-		printf("%s", line);
-		write(out, line,ft_strlen(line));
-		free(line);
-		line = get_next_line(in);
-	}
-	close(out);
-	if (execl("diff", "diff", file_in, file_out, NULL))
-	{
-		green();
-		printf("\nTest for file: %s passed\n", file_in);
-		reset();
-	}
-	else
-	{
-		red();
-		printf("\nTest for file: %s failed\n", file_in);
-		reset();
-	}
-	remove(file_out);
 	return (0);
 }
 
@@ -101,9 +106,9 @@ void	run_interactive_test(void)
 
 int	main(int argc, char **argv)
 {
-	char	*file_in;
-	char	*file_out;
-	int		result;
+	char		**filenames;
+	t_fd_list	*files;
+	int			result;
 
 	if(argc != 2)
 	{
@@ -119,18 +124,26 @@ int	main(int argc, char **argv)
 	printf("----------------------------\n");
 	if (ft_strncmp(argv[1], "interactive", 11) == 0)
 		run_interactive_test();
+	else if (ft_strncmp(argv[1], "static", 6) == 0)
+	{
+		//sets filenames
+		filenames = malloc(sizeof(char *) * NUMBER_OF_TESTS);
+		set_filenames(filenames);
+		//opens files
+		files = NULL;
+		open_files(files, filenames);
+		// runs static test 1
+		result = run_static_test1(files, filenames);
+		//closes files
+		close_files(files);
+		//frees filenames
+		free_filenames(filenames);
+	}
 	else
 	{
-		//sets file_in to the first argument
-		file_in = ft_strdup(argv[1]);
-		//sets file_out to the same string as file_in, but with ".out" appended
-		file_out = malloc(ft_strlen(file_in) + 4);
-		ft_strlcpy(file_out, file_in, ft_strlen(file_in) - 3);
-		ft_strlcat(file_out, ".out", ft_strlen(file_in) + 4);
-		// runs the test
-		result = run_static_test(file_in, file_out);
-		free(file_in);
-		free(file_out);
+		print_usage();
+		return (1);
 	}
+	free_files_list(files);
 	return (result);
 }
