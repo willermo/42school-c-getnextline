@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 16:48:15 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 13:28:42 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 17:34:32 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ void		reset();
 // TEST FUNCTIONS PROTOTYPES
 // TEST HELPER FUNCTIONS PROTOTYPES
 void	static_cleanup(t_fd_list **files, char **filenames);
-t_fd_list	*add_file(t_fd_list **files, char *filename);
-void	set_filenames(char ***filenames);
+int		add_file(t_fd_list **files, char *filename);
+void	set_filenames(char *prefix, char ***filenames);
 void	open_files(t_fd_list **files, char **filenames);
 void	close_files(t_fd_list *files);
 void	free_filenames(char **filenames);

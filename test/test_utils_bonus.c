@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 16:47:56 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 13:27:05 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 17:42:03 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,33 +19,33 @@ void	static_cleanup(t_fd_list **files, char **filenames)
 	free_files_list(*files);
 }
 
-t_fd_list	*add_file(t_fd_list **files, char *filename)
+int		add_file(t_fd_list **files, char *filename)
 {
-	t_fd_list	*new;
-	t_fd		fd;
+	t_fd	fd;
 
 	fd = open(filename, O_RDONLY);
 	if (fd < 0)
-		return (NULL);
-	new = get_fd_list(files, fd);
-	return (new);
+		return (0);
+	get_fd_list(files, fd);
+	return (1);
 }
 
-void	set_filenames(char ***filenames)
+void	set_filenames(char *prefix, char ***filenames)
 {
 	int		i;
 	char	*number;
 	char 	*filename;
 
+	(void) prefix;
 	i = 0;
 	number = ft_itoa(i + 1);
-	filename = ft_strjoin("test", number, ".txt");
+	filename = ft_strjoin(prefix, number, ".txt");
 	free(number);
 	while (access(filename, F_OK) == 0)
 	{
 		(*filenames)[i++] = filename;
 		number = ft_itoa(i + 1);
-		filename = ft_strjoin("test", number, ".txt");
+		filename = ft_strjoin(prefix, number, ".txt");
 		free(number);
 		*filenames = (char **) realloc(*filenames, sizeof(char *) * (i + 1));
 		(*filenames)[i] = NULL;
@@ -60,7 +60,7 @@ void	open_files(t_fd_list **files, char **filenames)
 	runner = filenames;
 	while (*runner)
 	{
-		if (add_file(files, *runner) == NULL)
+		if (!add_file(files, *runner))
 		{
 			yellow();
 			printf("Error opening file %s (error %d)\n", *runner, errno);
