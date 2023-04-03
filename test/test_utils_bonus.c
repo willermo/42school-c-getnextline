@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 16:47:56 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 03:16:52 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 03:39:15 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ void	set_filenames(char **filenames)
 		filenames[i] = ft_strjoin("test", ft_itoa(i + 1), ".txt");
 		i++;
 	}
-	filenames[i] = NULL;
 }
 
 void	open_files(t_fd_list *files, char **filenames)
