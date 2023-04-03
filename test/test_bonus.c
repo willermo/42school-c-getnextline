@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 12:26:11 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 11:18:14 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 13:18:45 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,12 @@ int	run_static_test1(t_fd_list *files, char **filenames)
 	t_fd		out;
 	char		*out_filename;
 	char		*line;
-	int			i;
-
-	i = 0;
-	while (i < NUMBER_OF_TESTS)
+	while (files)
 	{
 		//sets file_out to the same string as file_in, but with ".out" appended
-		out_filename = malloc(ft_strlen(filenames[i]) + 4);
-		ft_strlcpy(out_filename, filenames[i], ft_strlen(filenames[i]) - 3);
-		ft_strlcat(out_filename, ".out", ft_strlen(filenames[i]) + 4);
+		out_filename = malloc(ft_strlen(*filenames) + 4);
+		ft_strlcpy(out_filename, *filenames, ft_strlen(*filenames) - 3);
+		ft_strlcat(out_filename, ".out", ft_strlen(*filenames) + 4);
 		out = open(out_filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		if (out == -1)
 		{
@@ -51,7 +48,7 @@ int	run_static_test1(t_fd_list *files, char **filenames)
 			return (errno);
 		}
 		cyan();
-		printf("Testing file %s\n", filenames[i]);
+		printf("Testing file %s\n", *filenames);
 		reset();
 		line = get_next_line(files->fd);
 		while (line)
@@ -62,22 +59,22 @@ int	run_static_test1(t_fd_list *files, char **filenames)
 			line = get_next_line(files->fd);
 		}
 		close(out);
-		if (execl("diff", "diff", filenames[i], out_filename, NULL))
+		if (execl("diff", "diff", *filenames, out_filename, NULL))
 		{
 			green();
-			printf("Test for file: %s passed\n\n", filenames[i]);
+			printf("Test for file: %s passed\n\n", *filenames);
 			reset();
 		}
 		else
 		{
 			red();
-			printf("Test for file: %s failed\n", filenames[i]);
+			printf("Test for file: %s failed\n", *filenames);
 			reset();
 		}
 		remove(out_filename);
 		free(out_filename);
 		files = files->next;
-		i++;
+		filenames++;
 	}
 	return (0);
 }
@@ -126,8 +123,8 @@ int	main(int argc, char **argv)
 	else if (ft_strncmp(argv[1], "static", 6) == 0)
 	{
 		//sets filenames
-		filenames = malloc(sizeof(char *) * NUMBER_OF_TESTS);
-		set_filenames(filenames);
+		filenames = (char **) calloc(1, sizeof(char *));
+		set_filenames(&filenames);
 		//opens files
 		files = NULL;
 		open_files(&files, filenames);
@@ -136,7 +133,9 @@ int	main(int argc, char **argv)
 		//closes files
 		close_files(files);
 		// cleanup
-		static_cleanup(&files, &filenames);
+		static_cleanup(&files, filenames);
+		free(filenames);
+		filenames = NULL;
 	}
 	else
 	{

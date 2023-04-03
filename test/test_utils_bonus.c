@@ -6,13 +6,13 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 16:47:56 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 12:10:59 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 13:27:05 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "test_bonus.h"
 
-void	static_cleanup(t_fd_list **files, char ***filenames)
+void	static_cleanup(t_fd_list **files, char **filenames)
 {
 	//frees filenames
 	free_filenames(filenames);
@@ -31,38 +31,45 @@ t_fd_list	*add_file(t_fd_list **files, char *filename)
 	return (new);
 }
 
-void	set_filenames(char **filenames)
+void	set_filenames(char ***filenames)
 {
-	int i;
-	char *number;
+	int		i;
+	char	*number;
+	char 	*filename;
 
 	i = 0;
-	while (i < NUMBER_OF_TESTS)
+	number = ft_itoa(i + 1);
+	filename = ft_strjoin("test", number, ".txt");
+	free(number);
+	while (access(filename, F_OK) == 0)
 	{
+		(*filenames)[i++] = filename;
 		number = ft_itoa(i + 1);
-		filenames[i] = ft_strjoin("test", number, ".txt");
+		filename = ft_strjoin("test", number, ".txt");
 		free(number);
-		i++;
+		*filenames = (char **) realloc(*filenames, sizeof(char *) * (i + 1));
+		(*filenames)[i] = NULL;
 	}
+	free(filename);
 }
 
 void	open_files(t_fd_list **files, char **filenames)
 {
-	int 	i;
+	char	**runner;
 
-	i = 0;
-	while (i < NUMBER_OF_TESTS)
+	runner = filenames;
+	while (*runner)
 	{
-		if (add_file(files, filenames[i]) == NULL)
+		if (add_file(files, *runner) == NULL)
 		{
 			yellow();
-			printf("Error opening file %s (error %d)\n", filenames[i], errno);
+			printf("Error opening file %s (error %d)\n", *runner, errno);
 			reset();
 			close_files(*files);
-			free_filenames(&filenames);
+			free_filenames(filenames);
 			exit(errno);
 		}
-		i++;
+		runner++;
 	}
 }
 
@@ -75,19 +82,13 @@ void	close_files(t_fd_list *files)
 	}
 }
 
-void	free_filenames(char ***filenames)
+void	free_filenames(char **filenames)
 {
-	int i;
-
-	i = 0;
-	while (i < NUMBER_OF_TESTS)
+	while (*filenames)
 	{
-		free((*filenames)[i]);
-		(*filenames)[i] = NULL;
-		i++;
+		free(*filenames);
+		*filenames++ = NULL;
 	}
-	free(*filenames);
-	*filenames = NULL;
 }
 
 // beware: this function removes the files from the filesystem
@@ -101,7 +102,7 @@ void	remove_files(char **filenames)
 void	clean_filenames(char **filenames)
 {
 	remove_files(filenames);
-	free_filenames(&filenames);
+	free_filenames(filenames);
 }
 
 void	free_files_list(t_fd_list *file_list)
@@ -126,7 +127,7 @@ char	*ft_strjoin(char const *s1, char const *s2, char const *s3)
 
 	if (!s1 || !s2 || !s3)
 		return (NULL);
-	str = malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + ft_strlen(s3) + 1));
+	str = (char *) malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + ft_strlen(s3) + 1));
 	if (!str)
 		return (NULL);
 	ft_strlcpy(str, s1, ft_strlen(s1) + 1);

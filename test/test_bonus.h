@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 16:48:15 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 11:25:42 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 13:28:42 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 # include <stdlib.h>
 # include <stddef.h>
 # include "../get_next_line_bonus.h"
-# define NUMBER_OF_TESTS 10
 // COLORS FUNCTIONS PROTOTYPES
 void		black();
 void		red();
@@ -34,12 +33,12 @@ void		white();
 void		reset();
 // TEST FUNCTIONS PROTOTYPES
 // TEST HELPER FUNCTIONS PROTOTYPES
-void	static_cleanup(t_fd_list **files, char ***filenames);
+void	static_cleanup(t_fd_list **files, char **filenames);
 t_fd_list	*add_file(t_fd_list **files, char *filename);
-void	set_filenames(char **filenames);
+void	set_filenames(char ***filenames);
 void	open_files(t_fd_list **files, char **filenames);
 void	close_files(t_fd_list *files);
-void	free_filenames(char ***filenames);
+void	free_filenames(char **filenames);
 void	remove_files(char **filenames);
 void	clean_filenames(char **filenames);
 void	free_files_list(t_fd_list *fd_list);
