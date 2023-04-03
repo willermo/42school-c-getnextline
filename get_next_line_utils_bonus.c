@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 16:50:31 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 03:38:40 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 21:26:27 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 	return (dest);
 }
 
-t_fd_list	*new_fd_list(t_fd fd)
+t_fd_list	*new_file(t_fd fd)
 {
 	t_fd_list	*new;
 
@@ -70,13 +70,13 @@ t_fd_list	*new_fd_list(t_fd fd)
 	return (new);
 }
 
-t_fd_list	*get_fd_list(t_fd_list **fd_list, t_fd fd)
+t_fd_list	*get_file(t_fd_list **fd_list, t_fd fd)
 {
 	t_fd_list	*current;
 
 	if (!*fd_list)
 	{
-		*fd_list = new_fd_list(fd);
+		*fd_list = new_file(fd);
 		return (*fd_list);
 	}
 	current = *fd_list;
@@ -84,6 +84,6 @@ t_fd_list	*get_fd_list(t_fd_list **fd_list, t_fd fd)
 		current = current->next;
 	if (current->fd == fd)
 		return (current);
-	current->next = new_fd_list(fd);
+	current->next = new_file(fd);
 	return (current->next);
 }

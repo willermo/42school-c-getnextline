@@ -6,28 +6,17 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 16:47:56 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 17:42:03 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 22:48:10 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "test_bonus.h"
 
-void	static_cleanup(t_fd_list **files, char **filenames)
+void	setup_test(char *prefix, char ***filenames)
 {
-	//frees filenames
-	free_filenames(filenames);
-	free_files_list(*files);
-}
-
-int		add_file(t_fd_list **files, char *filename)
-{
-	t_fd	fd;
-
-	fd = open(filename, O_RDONLY);
-	if (fd < 0)
-		return (0);
-	get_fd_list(files, fd);
-	return (1);
+	// sets filenames
+	*filenames = (char **) calloc(1, sizeof(char *));
+	set_filenames(prefix, filenames);
 }
 
 void	set_filenames(char *prefix, char ***filenames)
@@ -36,7 +25,6 @@ void	set_filenames(char *prefix, char ***filenames)
 	char	*number;
 	char 	*filename;
 
-	(void) prefix;
 	i = 0;
 	number = ft_itoa(i + 1);
 	filename = ft_strjoin(prefix, number, ".txt");
@@ -53,24 +41,38 @@ void	set_filenames(char *prefix, char ***filenames)
 	free(filename);
 }
 
-void	open_files(t_fd_list **files, char **filenames)
+t_fd	open_file(char *filename, char mode)
 {
-	char	**runner;
+	t_fd	fd;
 
-	runner = filenames;
-	while (*runner)
+	if (mode == 'r')
+		fd = open(filename, O_RDONLY);
+	else if (mode == 'w')
+		fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	else
+		fd = (-1);
+	if (fd == -1)
 	{
-		if (!add_file(files, *runner))
-		{
-			yellow();
-			printf("Error opening file %s (error %d)\n", *runner, errno);
-			reset();
-			close_files(*files);
-			free_filenames(filenames);
-			exit(errno);
-		}
-		runner++;
+		yellow();
+		printf("Error opening file %s (error %d)\n", filename, errno);
+		reset();
+		exit(errno);
 	}
+	return (fd);
+}
+
+void	cleanup_test(char **filenames, t_fd_list *files)
+{
+	// frees filenames
+	free_filenames(filenames);
+	// closes files
+	close_files(files);
+	// frees files list
+	free_files_list(files);
+	files = NULL;
+	// frees filenames
+	free(filenames);
+	filenames = NULL;
 }
 
 void	close_files(t_fd_list *files)
@@ -91,20 +93,6 @@ void	free_filenames(char **filenames)
 	}
 }
 
-// beware: this function removes the files from the filesystem
-void	remove_files(char **filenames)
-{
-	while (*filenames)
-		remove(*filenames++);
-}
-
-// beware: this function removes the files from the filesystem
-void	clean_filenames(char **filenames)
-{
-	remove_files(filenames);
-	free_filenames(filenames);
-}
-
 void	free_files_list(t_fd_list *file_list)
 {
 	t_fd_list	*file;
@@ -119,6 +107,20 @@ void	free_files_list(t_fd_list *file_list)
 		free(file);
 		file = file_list;
 	}
+}
+
+// beware: this function removes the files from the filesystem
+void	remove_files(char **filenames)
+{
+	while (*filenames)
+		remove(*filenames++);
+}
+
+// beware: this function removes the files from the filesystem
+void	clean_filenames(char **filenames)
+{
+	remove_files(filenames);
+	free_filenames(filenames);
 }
 
 char	*ft_strjoin(char const *s1, char const *s2, char const *s3)
@@ -270,3 +272,21 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	return (0);
 }
 
+int	compare_files(FILE *fp1, FILE *fp2)
+{
+	char	ch1;
+	char	ch2;
+
+	ch1 = fgetc(fp1);
+	ch2 = fgetc(fp2);
+	while (ch1 != EOF && ch2 != EOF)
+	{
+		if (ch1 != ch2)
+			return(0);
+		ch1 = getc(fp1);
+		ch2 = getc(fp2);
+	}
+	if (ch1 == EOF && ch2 == EOF)
+		return (1);
+	return (0);
+}

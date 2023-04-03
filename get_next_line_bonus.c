@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 16:50:22 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 11:38:45 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 22:26:26 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ char	*get_next_line(t_fd fd)
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	line = NULL;
-	file = get_fd_list(&files, fd);
+	file = get_file(&files, fd);
 	if (file->bytes_read == 0)
 		file->bytes_remaining = read(fd, file->buffer, BUFFER_SIZE);
 	i = 0;
@@ -37,6 +37,9 @@ char	*get_next_line(t_fd fd)
 			file->bytes_remaining = read(fd, file->buffer, BUFFER_SIZE);
 		if (line[i - 1] == '\n')
 			break ;
+
 	}
+	if (!line)
+		file->bytes_read = 0;
 	return (line);
 }

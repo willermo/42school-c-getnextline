@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 16:50:39 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 10:11:15 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 21:26:55 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,6 @@ char	*get_next_line(int fd);
 char		*expand_line_buffer(char *line, size_t dim);
 void		*ft_calloc(size_t count, size_t size);
 void		*ft_memcpy(void *dest, const void *src, size_t n);
-t_fd_list	*new_fd_list(t_fd fd);
-t_fd_list	*get_fd_list(t_fd_list **fd_list, t_fd fd);
+t_fd_list	*new_file(t_fd fd);
+t_fd_list	*get_file(t_fd_list **fd_list, t_fd fd);
 #endif

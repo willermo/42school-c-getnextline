@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 16:48:15 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 17:34:32 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 22:47:16 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 # include <stdio.h>
 # include <errno.h>
 # include <fcntl.h>
+#include<sys/types.h>
 # include <sys/stat.h>
 # include <unistd.h>
 # include <string.h>
@@ -33,10 +34,10 @@ void		white();
 void		reset();
 // TEST FUNCTIONS PROTOTYPES
 // TEST HELPER FUNCTIONS PROTOTYPES
-void	static_cleanup(t_fd_list **files, char **filenames);
-int		add_file(t_fd_list **files, char *filename);
+void	setup_test(char *prefix, char ***filenames);
 void	set_filenames(char *prefix, char ***filenames);
-void	open_files(t_fd_list **files, char **filenames);
+t_fd	open_file(char *filename, char mode);
+void	cleanup_test(char **filenames, t_fd_list *files);
 void	close_files(t_fd_list *files);
 void	free_filenames(char **filenames);
 void	remove_files(char **filenames);
@@ -51,4 +52,5 @@ char	*ft_itoa(int n);
 char	*ft_strdup(const char *s);
 size_t	ft_strlcat(char *dest, const char *src, size_t size);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
+int		compare_files(FILE *file1, FILE *file2);
 #endif
