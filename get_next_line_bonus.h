@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 16:50:39 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 23:50:47 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/04 00:25:24 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 32
 # endif
-#include <unistd.h>
-#include <stdlib.h>
+# include <unistd.h>
+# include <stdlib.h>
 
 typedef int	t_fd;
 typedef struct fd_list
