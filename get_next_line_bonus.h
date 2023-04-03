@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 16:50:39 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 21:26:55 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 23:50:47 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 32
 # endif
-#include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -28,9 +27,7 @@ typedef struct fd_list
 	size_t			bytes_remaining;
 	struct fd_list	*next;
 }	t_fd_list;
-/* BASE FUNCTION PROTOTYPE */
-char	*get_next_line(int fd);
-/* HELPER FUNCTIONS PROTOTYPES */
+char		*get_next_line(int fd);
 char		*expand_line_buffer(char *line, size_t dim);
 void		*ft_calloc(size_t count, size_t size);
 void		*ft_memcpy(void *dest, const void *src, size_t n);
