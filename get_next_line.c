@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 16:50:22 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 00:35:32 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/03 23:43:51 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,5 +38,7 @@ char	*get_next_line(t_fd fd)
 		if (line[i - 1] == '\n')
 			break ;
 	}
+	if (!line)
+		bytes_read = 0;
 	return (line);
 }
