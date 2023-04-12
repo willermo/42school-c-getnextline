@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 16:50:31 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/12 19:30:42 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/12 22:22:46 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,4 +91,3 @@ void	*ft_memset(void *s, int c, size_t n)
 		runner[i++] = c;
 	return (s);
 }
-
