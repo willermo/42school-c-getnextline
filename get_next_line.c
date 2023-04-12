@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 16:50:22 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/06 16:17:35 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/12 19:23:27 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,38 +30,31 @@ static char	*expand_line_buffer(char *line)
 	return (buf);
 }
 
-static int add_chunk(char **line, char *storage, t_fd fd)
+static int	feed_buffer(char *buffer, int index, t_fd fd)
+{
+	ft_memmove(buffer, buffer + index, BUFFER_SIZE - index);
+	ft_memset(buffer + BUFFER_SIZE - index, '\0', index);
+	//write(1, buffer, BUFFER_SIZE);
+	if (index == BUFFER_SIZE || index == 0)
+		return (read(fd, buffer, BUFFER_SIZE));
+	return (0);
+
+}
+
+static int add_chunk(char *line, char *storage, t_fd fd)
 {
 	int		i;
-	char	*line_runner;
 
-	line_runner = *line;
-	while (*line_runner)
-		line_runner++;
+	while (*line)
+		line++;
 	i = 0;
-	printf("START\n");
-	while(i < BUFFER_SIZE && storage[i] != '\0')
+	while(i < BUFFER_SIZE && storage[i])
 	{
-		line_runner[i] = storage[i];
-		i++;
-		if (line_runner[i - 1] == '\n')
-		{
-			ft_memmove(storage, storage + i, BUFFER_SIZE - i);
-			ft_memset(storage + i, '\0', BUFFER_SIZE - i);
-			printf("Line in: %s\n", *line);
-			return (0);
-		}
+		line[i] = storage[i];
+		if (line[i++] == '\n')
+			break;
 	}
-	printf("Line: %s\n", *line);
-	sleep(1);
-	if (i == BUFFER_SIZE)
-	{
-		*line = expand_line_buffer(*line);
-		return (read(fd, storage, BUFFER_SIZE));
-	}
-	ft_memmove(storage, storage + i, BUFFER_SIZE - i);
-	ft_memset(storage + i, '\0', BUFFER_SIZE - i);
-	return (1);
+	return(feed_buffer(storage, i, fd));
 }
 
 char	*get_next_line(t_fd fd)
@@ -72,7 +65,8 @@ char	*get_next_line(t_fd fd)
 	if (fd < 0 || fd >= 4096 || fd == 1 || fd == 2 || BUFFER_SIZE <= 0)
 		return(NULL);
 	line = expand_line_buffer(NULL);
-	while (line && add_chunk(&line, storage, fd) > 0)
-		;
+	while (line && add_chunk(line, storage, fd) > 0)
+		line = expand_line_buffer(line);
+	sleep(1);
 	return (line);
 }
