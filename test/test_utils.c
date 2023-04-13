@@ -6,54 +6,11 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 16:47:56 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 01:11:10 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/12 19:32:28 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "test.h"
-
-void	free_files(char **files)
-{
-	int i;
-
-	i = 0;
-	while (i < NUMBER_OF_TESTS)
-	{
-		free(files[i]);
-		i++;
-	}
-}
-
-void	remove_files(char **files)
-{
-	int i;
-
-	i = 0;
-	while (i < NUMBER_OF_TESTS)
-	{
-		remove(files[i]);
-		i++;
-	}
-}
-
-void	clean_files(char **files)
-{
-	remove_files(files);
-	free_files(files);
-}
-
-void	free_files_list(t_fd_list *fd_list)
-{
-	t_fd_list	*fd_runner;
-
-	fd_runner = fd_list;
-	while (fd_runner)
-	{
-		fd_list = fd_list->next;
-		free(fd_runner);
-		fd_runner = fd_list;
-	}
-}
 
 char	*ft_strjoin(char const *s1, char const *s2, char const *s3)
 {
@@ -68,16 +25,6 @@ char	*ft_strjoin(char const *s1, char const *s2, char const *s3)
 	ft_strlcat(str, s2, ft_strlen(s1) + ft_strlen(s2) + 1);
 	ft_strlcat(str, s3, ft_strlen(s1) + ft_strlen(s2) + ft_strlen(s3) + 1);
 	return (str);
-}
-
-size_t	ft_strlen(const char *str)
-{
-	int	len;
-
-	len = 0;
-	while (*str++)
-		len++;
-	return (len);
 }
 
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
@@ -163,31 +110,6 @@ char	*ft_strdup(const char *s)
 	return (dup);
 }
 
-size_t	ft_strlcat(char *dest, const char *src, size_t size)
-{
-	char	*p;
-
-	p = dest;
-	while (size != 0 && *p != '\0')
-	{
-		p++;
-		size--;
-	}
-	if (size != 0)
-	{
-		while (--size != 0)
-		{
-			*p = *src;
-			if (*p == '\0')
-				return (p - dest);
-			p++;
-			src++;
-		}
-		*p = '\0';
-	}
-	return ((p - dest) + ft_strlen(src));
-}
-
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
 {
 	if (n == 0)
@@ -204,3 +126,31 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	return (0);
 }
 
+size_t	ft_strlcat(char *dest, const char *src, size_t size)
+{
+	char		*d;
+	const char	*s;
+	size_t		n;
+	size_t		dlen;
+
+	d = dest;
+	s = src;
+	n = size;
+	while (n-- && *d)
+		d++;
+	dlen = d - dest;
+	n = size - dlen;
+	if (n == 0)
+		return (dlen + ft_strlen(s));
+	while (*s)
+	{
+		if (n != 1)
+		{
+			*d++ = *s;
+			n--;
+		}
+		s++;
+	}
+	*d = '\0';
+	return (dlen + (s - src));
+}

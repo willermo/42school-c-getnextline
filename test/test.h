@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/02 16:48:15 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/02 18:47:54 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/06 00:56:50 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,6 @@ void		white();
 void		reset();
 // TEST FUNCTIONS PROTOTYPES
 // TEST HELPER FUNCTIONS PROTOTYPES
-void	free_files(char **files);
-void	remove_files(char **files);
-void	clean_files(char **files);
-void	free_files_list(t_fd_list *fd_list);
 char	*ft_strjoin(char const *s1, char const *s2, char const *s3);
 size_t	ft_strlen(const char *str);
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize);

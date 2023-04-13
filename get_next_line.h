@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 16:50:39 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/03 23:50:57 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/13 15:02:22 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,9 @@
 
 typedef int	t_fd;
 char	*get_next_line(int fd);
-char	*expand_line_buffer(char *line, size_t dim);
 void	*ft_calloc(size_t count, size_t size);
 void	*ft_memcpy(void *dest, const void *src, size_t n);
+void	*ft_memmove(void *dest, const void *src, size_t n);
+void	*ft_memset(void *s, int c, size_t n);
+size_t	ft_strlen(const char *str);
 #endif

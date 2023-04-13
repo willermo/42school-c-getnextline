@@ -6,37 +6,64 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 16:50:22 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/04 00:25:59 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/13 16:36:12 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
+static char	*expand_line_buffer(char *line)
+{
+	char	*buf;
+	char	*buf_runner;
+	char	*line_runner;
+
+	if (!line)
+		return ((char *) ft_calloc(sizeof(char), BUFFER_SIZE + 1));
+	buf = (char *) ft_calloc(sizeof(char), ft_strlen(line) + BUFFER_SIZE + 1);
+	line_runner = line;
+	buf_runner = buf;
+	while (*line_runner)
+		*buf_runner++ = *line_runner++;
+	free(line);
+	return (buf);
+}
+
+static int	add_chunk(char *line, char *storage, t_fd fd)
+{
+	int	i;
+
+	while (*line)
+		line++;
+	i = 0;
+	while (i < BUFFER_SIZE && storage[i])
+	{
+		line[i] = storage[i];
+		if (line[i++] == '\n')
+		{
+			ft_memmove(storage, storage + i, BUFFER_SIZE - i);
+			ft_memset(storage + BUFFER_SIZE - i, '\0', i);
+			return (0);
+		}
+	}
+	ft_memset(storage, '\0', BUFFER_SIZE);
+	return (read(fd, storage, BUFFER_SIZE));
+}
+
 char	*get_next_line(t_fd fd)
 {
-	char						*line;
-	static char					buffer[BUFFER_SIZE];
-	static int					bytes_read;
-	static size_t				bytes_remaining;
-	size_t						i;
+	char		*line;
+	static char	storage[BUFFER_SIZE];
 
-	line = NULL;
-	if (bytes_read == 0)
-		bytes_remaining = read(fd, buffer, BUFFER_SIZE);
-	i = 0;
-	while (fd > 0 && BUFFER_SIZE > 0 && bytes_remaining)
+	if (fd < 0 || fd >= 4096 || fd == 1 || fd == 2 || BUFFER_SIZE <= 0)
+		return (NULL);
+	line = expand_line_buffer(NULL);
+	while (line && add_chunk(line, storage, fd) > 0)
+		line = expand_line_buffer(line);
+	if (line && !*line)
 	{
-		if (i % BUFFER_SIZE == 0)
-			line = expand_line_buffer(line, bytes_read / BUFFER_SIZE + 1);
-		line[i++] = buffer[bytes_read++ % BUFFER_SIZE];
-		if (fd == 0 && line[i - 1] == '\n')
-			bytes_read = 0;
-		else if (--bytes_remaining == 0)
-			bytes_remaining = read(fd, buffer, BUFFER_SIZE);
-		if (line[i - 1] == '\n')
-			break ;
+		free(line);
+		return (NULL);
 	}
-	if (!line)
-		bytes_read = 0;
 	return (line);
 }
