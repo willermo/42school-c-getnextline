@@ -6,7 +6,7 @@
 /*   By: doriani <doriani@student.42roma.it>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/31 16:50:22 by doriani           #+#    #+#             */
-/*   Updated: 2023/04/12 22:22:30 by doriani          ###   ########.fr       */
+/*   Updated: 2023/04/13 16:36:12 by doriani          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,18 +29,9 @@ static char	*expand_line_buffer(char *line)
 	return (buf);
 }
 
-static int	feed_buffer(char *buffer, int index, t_fd fd)
-{
-	ft_memmove(buffer, buffer + index, BUFFER_SIZE - index);
-	ft_memset(buffer + BUFFER_SIZE - index, '\0', index);
-	if (index == BUFFER_SIZE || index == 0)
-		return (read(fd, buffer, BUFFER_SIZE));
-	return (0);
-}
-
 static int	add_chunk(char *line, char *storage, t_fd fd)
 {
-	int		i;
+	int	i;
 
 	while (*line)
 		line++;
@@ -49,9 +40,14 @@ static int	add_chunk(char *line, char *storage, t_fd fd)
 	{
 		line[i] = storage[i];
 		if (line[i++] == '\n')
-			break ;
+		{
+			ft_memmove(storage, storage + i, BUFFER_SIZE - i);
+			ft_memset(storage + BUFFER_SIZE - i, '\0', i);
+			return (0);
+		}
 	}
-	return (feed_buffer(storage, i, fd));
+	ft_memset(storage, '\0', BUFFER_SIZE);
+	return (read(fd, storage, BUFFER_SIZE));
 }
 
 char	*get_next_line(t_fd fd)
